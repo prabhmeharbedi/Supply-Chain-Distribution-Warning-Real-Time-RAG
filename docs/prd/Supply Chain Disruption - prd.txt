@@ -1,0 +1,387 @@
+# Supply Chain Disruption Predictor - Product Requirements Document
+
+## 1. Executive Summary
+
+### 1.1 Product Vision
+Build a real-time supply chain disruption prediction platform that provides 2-7 day advance warnings of potential supply chain impacts, enabling companies to proactively mitigate risks and optimize operations.
+
+### 1.2 Business Opportunity
+- **Market Size**: Global supply chain management market: $37.4B (2023), projected $70.4B by 2028
+- **Problem Scale**: Companies lose 6-10% annual revenue from supply chain disruptions
+- **Target ROI**: 15-30% reduction in expedited shipping costs, 5-10% prevention of stockout losses
+
+### 1.3 Success Metrics
+- **Prediction Accuracy**: 80%+ accuracy for disruptions 2+ days in advance
+- **False Positive Rate**: <15% to maintain user trust
+- **Response Time**: <30 seconds from data ingestion to alert generation
+- **Business Impact**: Demonstrate $100K+ annual savings for pilot customers
+
+## 2. Product Overview
+
+### 2.1 Core Value Proposition
+"Know about supply chain disruptions before your competitors do, giving you 2-7 days to take protective action."
+
+### 2.2 Target Users
+**Primary**: Supply Chain Managers, Procurement Directors, Operations VPs
+**Secondary**: Risk Managers, C-Suite Executives, Trading Desks
+
+### 2.3 Key Differentiators
+- Real-time data processing (not batch)
+- Multi-source intelligence correlation
+- Industry-agnostic disruption detection
+- Actionable severity scoring and recommendations
+
+## 3. Detailed Feature Requirements
+
+### 3.1 MVP Core Features
+
+#### 3.1.1 Real-Time Data Ingestion Engine
+**Requirement**: Continuously monitor and ingest data from multiple external sources
+**Data Sources**:
+- Weather APIs (OpenWeatherMap, NOAA)
+- News feeds (NewsAPI, Reuters, Guardian)
+- Natural disaster alerts (USGS, NASA)
+- Transportation status (FlightAware, MarineTraffic)
+
+**Technical Specs**:
+- Pathway-powered streaming ETL pipeline
+- 5-minute refresh intervals for critical sources
+- Automatic failover for API downtime
+- Data validation and cleaning layers
+
+#### 3.1.2 Intelligent Disruption Detection
+**Requirement**: Analyze incoming data to identify potential supply chain impacts
+
+**Detection Algorithms**:
+- Keyword-based filtering for supply chain relevant events
+- Geographic correlation with major trade routes
+- Severity scoring based on historical impact data
+- Supply chain entity recognition (ports, suppliers, routes)
+
+**Alert Categories**:
+- **Critical**: Immediate action required (>70% confidence, high impact)
+- **Warning**: Monitor closely (50-70% confidence, medium impact)  
+- **Watch**: Awareness only (<50% confidence, low-medium impact)
+
+#### 3.1.3 Impact Assessment Engine
+**Requirement**: Estimate business impact and provide actionable insights
+
+**Impact Metrics**:
+- Affected trade routes and transportation modes
+- Estimated duration of disruption
+- Alternative route suggestions
+- Historical precedent analysis
+- Cost impact estimation
+
+#### 3.1.4 Real-Time Dashboard
+**Requirement**: Provide intuitive interface for monitoring and decision-making
+
+**Dashboard Components**:
+- Global map view with disruption overlays
+- Alert feed with filtering and search
+- Impact timeline and severity trends
+- Supplier/route vulnerability scoring
+- Custom alert configuration
+
+#### 3.1.5 Alert & Notification System
+**Requirement**: Deliver timely notifications through preferred channels
+
+**Notification Channels**:
+- Email alerts with customizable frequency
+- Slack/Teams integration
+- SMS for critical alerts
+- REST API webhooks for system integration
+
+### 3.2 Advanced Features (Post-MVP)
+
+#### 3.2.1 Predictive Analytics
+- Machine learning models for disruption probability
+- Lead time optimization recommendations
+- Seasonal and cyclical pattern recognition
+
+#### 3.2.2 Supply Chain Mapping
+- Custom supply chain topology configuration
+- Tier 2/3 supplier risk assessment
+- Dependency impact analysis
+
+#### 3.2.3 Financial Impact Modeling
+- Cost-benefit analysis for mitigation strategies
+- Insurance claim automation
+- Budget impact forecasting
+
+## 4. Technical Architecture
+
+### 4.1 High-Level System Design
+
+```
+Data Sources → Pathway ETL → Processing Engine → Vector DB → API Layer → Frontend
+     ↓              ↓              ↓              ↓          ↓         ↓
+  Weather         Stream         Disruption    Embeddings   REST     Dashboard
+  News           Processing      Detection      & Search    API      Mobile App
+  Transport      Real-time       ML Models     Historical   Webhooks  Alerts
+  Government     Indexing        Scoring       Context
+```
+
+### 4.2 Technology Stack
+
+**Core Framework**: Pathway (real-time data processing)
+**Backend**: Python, FastAPI
+**Database**: PostgreSQL (structured), Pathway Vector Store (embeddings)
+**Frontend**: React.js, Tailwind CSS
+**Infrastructure**: AWS/GCP, Docker, Kubernetes
+**Monitoring**: Prometheus, Grafana
+**CI/CD**: GitHub Actions
+
+### 4.3 Data Pipeline Architecture
+
+```python
+# Pathway Pipeline Structure
+import pathway as pw
+
+# Data ingestion streams
+weather_stream = pw.io.http.rest_connector(url="weather_endpoint")
+news_stream = pw.io.jsonlines.read("news_feed")
+transport_stream = pw.io.csv.read("transport_status")
+
+# Real-time processing
+processed_data = pw.apply_with_type(
+    process_supply_chain_data,
+    weather_stream + news_stream + transport_stream
+)
+
+# Disruption detection
+alerts = processed_data.select(
+    severity=pw.this.apply(calculate_severity),
+    impact=pw.this.apply(assess_impact),
+    recommendations=pw.this.apply(generate_recommendations)
+)
+
+# Vector embedding for similarity search
+embedded_alerts = alerts.select(
+    content=pw.this.description,
+    vector=pw.this.content.apply(embed_text),
+    metadata=pw.this.select(severity, impact, location)
+)
+```
+
+## 5. Implementation Roadmap
+
+### 5.1 Phase 1: MVP Development
+
+#### 1: Foundation
+**Deliverables**:
+- Pathway environment setup and basic pipeline
+- Weather API integration (OpenWeatherMap)
+- News API integration (NewsAPI)
+- Basic disruption keyword detection
+- Simple alert scoring algorithm
+
+**Success Criteria**:
+- Process 100+ weather events/day
+- Detect 10+ relevant news articles/day
+- Generate basic severity scores
+
+#### 2: Core Intelligence
+**Deliverables**:
+- USGS earthquake API integration
+- Transportation status APIs (FlightAware)
+- Geographic correlation engine
+- Enhanced disruption detection logic
+- Basic impact assessment
+
+**Success Criteria**:
+- Correlate events with major trade routes
+- Identify 5+ disruption categories
+- Generate impact estimates
+
+#### 3: User Interface
+**Deliverables**:
+- Real-time dashboard development
+- Alert management system
+- Basic notification system (email)
+- REST API endpoints
+- Simple configuration interface
+
+**Success Criteria**:
+- Display real-time alerts on dashboard
+- Send email notifications within 2 minutes
+- Support basic alert filtering
+
+#### 4: Integration & Demo
+**Deliverables**:
+- System integration testing
+- Performance optimization
+- Demo video creation
+- Documentation completion
+- Deployment automation
+
+**Success Criteria**:
+- Process 1000+ events/day with <30s latency
+- Demonstrate end-to-end workflow
+- Complete hackathon requirements
+
+### 5.2 Phase 2: Pilot Deployment 
+
+####  Pilot Customer Onboarding
+**Objectives**:
+- Onboard 3-5 pilot customers
+- Custom alert configuration
+- User feedback collection
+- Performance monitoring
+
+**Deliverables**:
+- Customer onboarding portal
+- Advanced filtering options
+- Usage analytics dashboard
+- Customer success metrics
+
+####  Feature Enhancement
+**Objectives**:
+- Implement customer feedback
+- Add advanced data sources
+- Improve prediction accuracy
+- Scale infrastructure
+
+**Deliverables**:
+- Additional API integrations
+- Enhanced ML models
+- Mobile responsive design
+- Multi-tenant architecture
+
+####  Validation & Metrics
+**Objectives**:
+- Validate business impact
+- Measure prediction accuracy
+- Document cost savings
+- Prepare for scale
+
+**Deliverables**:
+- ROI case studies
+- Accuracy benchmarking
+- Performance optimization
+- Sales material development
+
+
+## 6. Risk Assessment & Mitigation
+
+### 6.1 Technical Risks
+
+**Risk**: API rate limits and reliability
+**Mitigation**: Multiple data source redundancy, caching strategies, graceful degradation
+
+**Risk**: Real-time processing performance
+**Mitigation**: Pathway optimization, horizontal scaling, performance monitoring
+
+**Risk**: Data quality and false positives
+**Mitigation**: Multi-source validation, confidence scoring, human feedback loops
+
+### 6.2 Business Risks
+
+**Risk**: Customer adoption challenges
+**Mitigation**: Pilot program, strong ROI demonstration, user experience focus
+
+**Risk**: Competitive response
+**Mitigation**: IP protection, rapid feature development, customer lock-in
+
+**Risk**: Regulatory compliance
+**Mitigation**: Data privacy compliance, security audits, legal review
+
+## 7. Success Metrics & KPIs
+
+### 7.1 Product Metrics
+- **Prediction Accuracy**: Target 80%+ for 2+ day lead time
+- **Alert Quality**: <15% false positive rate
+- **Response Time**: <30 seconds end-to-end processing
+- **System Uptime**: 99.9% availability
+
+### 7.2 Business Metrics
+- **Customer Acquisition**: 50+ enterprise customers by month 12
+- **Revenue Growth**: $1M ARR by month 12
+- **Customer Retention**: 90%+ annual retention rate
+- **Cost Savings**: Document $10M+ in customer cost savings
+
+### 7.3 User Engagement
+- **Daily Active Users**: 70%+ of licensed users
+- **Alert Action Rate**: 60%+ of critical alerts result in user action
+- **Feature Adoption**: 80%+ usage of core features
+- **Net Promoter Score**: 50+ NPS score
+
+## 8. Go-to-Market Strategy
+
+### 8.1 Target Customer Segments
+
+**Tier 1**: Fortune 500 manufacturing, retail, and automotive companies
+**Tier 2**: Mid-market companies with complex supply chains
+**Tier 3**: Supply chain consulting firms and 3PLs
+
+### 8.2 Pricing Strategy
+
+**Pilot**: Free for 90 days with limited features
+**Professional**: $5,000/month per company (up to 10 users)
+**Enterprise**: $15,000/month per company (unlimited users + custom features)
+**Custom**: Negotiated pricing for Fortune 100 customers
+
+### 8.3 Sales Approach
+
+**Month 1-3**: Direct founder sales to pilot customers
+**Month 4-6**: Inside sales team hiring and training
+**Month 7-12**: Field sales expansion and channel partnerships
+
+## 9. Investment Requirements
+
+### 9.1 Team Scaling
+- **Engineering**: 3 backend, 2 frontend, 1 DevOps, 1 ML engineer
+- **Product**: 1 product manager, 1 designer
+- **Sales**: 2 sales reps, 1 customer success manager
+- **Operations**: 1 operations manager
+
+### 9.2 Technology Infrastructure
+- **Cloud Infrastructure**: $10K/month AWS/GCP
+- **Data Sources**: $15K/month API subscriptions
+- **Software Licenses**: $5K/month development tools
+- **Security & Compliance**: $10K/month tools and audits
+
+### 9.3 Total Funding Requirement
+**Seed Round**: $2M for 18-month runway
+**Series A**: $8M for market expansion and team scaling
+
+## 10. Competitive Analysis
+
+### 10.1 Direct Competitors
+- **Resilinc**: Supply chain risk monitoring
+- **Riskmethods**: Supplier risk management
+- **Everstream Analytics**: Supply chain intelligence
+
+### 10.2 Competitive Advantages
+- **Real-time Processing**: Pathway-powered vs batch processing
+- **Multi-source Intelligence**: Broader data correlation
+- **Ease of Use**: Plug-and-play vs complex implementations
+- **Cost Effectiveness**: SaaS model vs enterprise consulting
+
+### 10.3 Differentiation Strategy
+- Focus on prediction vs just monitoring
+- Industry-agnostic vs vertical-specific
+- Real-time vs historical analysis
+- Self-service vs managed service
+
+## 11. Future Vision
+
+### 11.1 3-Year Vision
+Become the leading real-time supply chain intelligence platform, serving 1000+ enterprise customers globally with AI-powered predictive capabilities.
+
+### 11.2 5-Year Vision
+Expand into autonomous supply chain optimization, providing not just predictions but automated decision-making and action-taking capabilities.
+
+### 11.3 Technology Roadmap
+- Advanced AI/ML prediction models
+- Autonomous supply chain optimization
+- Blockchain integration for transparency
+- IoT sensor integration for real-time monitoring
+- Digital twin supply chain modeling
+
+---
+
+**Document Version**: 1.0  
+**Last Updated**: May 25, 2025  
+**Document Owner**: Prabhmehar 
+**Next Review**: June 1, 2025

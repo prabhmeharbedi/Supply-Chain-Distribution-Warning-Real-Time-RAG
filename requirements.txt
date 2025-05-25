@@ -1,0 +1,66 @@
+# Core Framework
+pathway
+
+# Web Framework
+fastapi
+uvicorn[standard]
+pydantic
+pydantic-settings
+python-dotenv
+
+# Data Processing
+requests
+pandas
+numpy
+scikit-learn
+
+# Database
+psycopg2-binary
+sqlalchemy
+alembic
+redis
+
+# Authentication & Security
+python-jose[cryptography]
+passlib[bcrypt]
+bcrypt
+
+# Monitoring & Metrics
+prometheus-client
+psutil
+
+# File Handling
+python-multipart
+aiofiles
+
+# HTTP Client
+httpx
+
+# AI/ML (Required for RAG and intelligent analysis)
+sentence-transformers>=2.2.0
+openai>=1.0.0
+faiss-cpu>=1.7.4
+transformers>=4.30.0
+torch>=2.0.0
+langchain>=0.1.0
+tiktoken>=0.5.0
+
+# Visualization (Optional)
+matplotlib
+seaborn
+plotly
+
+# Task Queue (Optional)
+celery
+
+# Testing
+pytest
+pytest-asyncio
+
+# Development
+black
+flake8
+mypy
+
+PyJWT
+bcrypt

@@ -1,0 +1,48 @@
+{
+  "id": "alert_001",
+  "timestamp": "2024-01-15T10:30:00Z",
+  "event_type": "weather_alert",
+  "severity": "critical",
+  "title": "Severe Storm Warning - Port Operations Affected",
+  "description": "Major storm system approaching Los Angeles Port area. Expected wind speeds of 60+ mph and heavy rainfall. Port operations may be suspended for 6-8 hours.",
+  "location": "Los Angeles Port",
+  "coordinates": {
+    "latitude": 33.7361,
+    "longitude": -118.2639
+  },
+  "confidence_score": 0.92,
+  "impact_score": 0.85,
+  "alert_score": 0.88,
+  "priority_rank": 1,
+  "should_alert": true,
+  "escalation_needed": true,
+  "source": {
+    "type": "weather",
+    "provider": "National Weather Service",
+    "url": "https://weather.gov/alerts/CA-LA-001"
+  },
+  "affected_areas": [
+    "Los Angeles Port",
+    "Long Beach Port",
+    "San Pedro Bay"
+  ],
+  "estimated_impact": {
+    "duration_hours": 8,
+    "affected_vessels": 45,
+    "cargo_delay_tons": 12500,
+    "economic_impact_usd": 2500000
+  },
+  "recommendations": [
+    "Suspend port operations immediately",
+    "Secure all cargo containers",
+    "Evacuate non-essential personnel",
+    "Monitor weather updates every 30 minutes"
+  ],
+  "pathway_metadata": {
+    "processing_time_ms": 150,
+    "embedding_vector_id": "emb_001",
+    "relevance_score": 0.94,
+    "real_time_processed": true,
+    "data_freshness": "live"
+  }
+} 
