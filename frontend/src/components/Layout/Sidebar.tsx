@@ -1,60 +1,71 @@
 import React from 'react';
 import {
-  LayoutDashboard,
-  AlertTriangle,
-  BarChart3,
-  Settings,
-  Globe,
-  TrendingUp,
-  Shield,
-  Bell,
-  Users,
-  FileText,
-} from 'lucide-react';
-import { motion } from 'framer-motion';
-import { clsx } from 'clsx';
+  Box,
+  List,
+  ListItem,
+  ListItemButton,
+  ListItemIcon,
+  ListItemText,
+  Typography,
+  Divider,
+  Badge,
+  Chip,
+} from '@mui/material';
+import {
+  Dashboard as DashboardIcon,
+  Warning as AlertIcon,
+  Public as MapIcon,
+  Analytics as AnalyticsIcon,
+  Security as SecurityIcon,
+  TrendingUp as PerformanceIcon,
+  Notifications as NotificationsIcon,
+  Group as TeamIcon,
+  Description as ReportsIcon,
+  Settings as SettingsIcon,
+} from '@mui/icons-material';
+import { useTheme } from '@mui/material/styles';
 import { useAppContext } from '../../contexts/AppContext';
 
 const navigationItems = [
   {
     name: 'Dashboard',
     href: '/',
-    icon: LayoutDashboard,
+    icon: DashboardIcon,
     description: 'Overview & key metrics',
     active: true,
   },
   {
     name: 'Alerts',
     href: '/alerts',
-    icon: AlertTriangle,
+    icon: AlertIcon,
     description: 'Active disruptions',
     active: false,
   },
   {
     name: 'Map View',
     href: '/map',
-    icon: Globe,
+    icon: MapIcon,
     description: 'Geographic visualization',
     active: false,
   },
   {
     name: 'Analytics',
     href: '/analytics',
-    icon: BarChart3,
+    icon: AnalyticsIcon,
     description: 'Historical trends',
     active: false,
   },
   {
     name: 'Risk Assessment',
     href: '/risk',
-    icon: Shield,
+    icon: SecurityIcon,
     description: 'Vulnerability analysis',
     active: false,
   },
   {
     name: 'Performance',
     href: '/performance',
-    icon: TrendingUp,
+    icon: PerformanceIcon,
     description: 'System metrics',
     active: false,
   },
@@ -64,150 +75,198 @@ const secondaryItems = [
   {
     name: 'Notifications',
     href: '/notifications',
-    icon: Bell,
+    icon: NotificationsIcon,
     description: 'Alert preferences',
   },
   {
     name: 'Team',
     href: '/team',
-    icon: Users,
+    icon: TeamIcon,
     description: 'User management',
   },
   {
     name: 'Reports',
     href: '/reports',
-    icon: FileText,
+    icon: ReportsIcon,
     description: 'Export & reporting',
   },
   {
     name: 'Settings',
     href: '/settings',
-    icon: Settings,
+    icon: SettingsIcon,
     description: 'System configuration',
   },
 ];
 
 export default function Sidebar() {
+  const theme = useTheme();
   const { state } = useAppContext();
   const criticalAlertsCount = state.alerts.filter(
     alert => alert.severity === 'critical' && !alert.acknowledged
   ).length;
 
-  if (!state.sidebarOpen) {
-    return (
-      <motion.div
-        initial={{ width: 280 }}
-        animate={{ width: 80 }}
-        transition={{ duration: 0.3, ease: 'easeInOut' }}
-        className="fixed left-0 top-0 h-full bg-white border-r border-neutral-200 z-30 shadow-soft"
-      >
-        <div className="p-4">
-          <div className="w-12 h-12 bg-primary-500 rounded-xl flex items-center justify-center">
-            <Shield className="w-6 h-6 text-white" />
-          </div>
-        </div>
-        
-        <nav className="mt-8">
-          {navigationItems.map((item) => (
-            <button
-              key={item.name}
-              className={clsx(
-                'flex items-center px-4 py-3 mx-2 rounded-lg transition-all duration-200 w-full',
-                'hover:bg-neutral-100 group relative',
-                item.active
-                  ? 'bg-primary-50 text-primary-700 border-r-2 border-primary-500'
-                  : 'text-neutral-600 hover:text-neutral-900'
-              )}
-            >
-              <item.icon className="w-5 h-5" />
-              {item.name === 'Alerts' && criticalAlertsCount > 0 && (
-                <span className="absolute -top-1 -right-1 w-5 h-5 bg-error-500 text-white text-xs rounded-full flex items-center justify-center">
-                  {criticalAlertsCount}
-                </span>
-              )}
-            </button>
-          ))}
-        </nav>
-      </motion.div>
-    );
-  }
-
   return (
-    <motion.div
-      initial={{ width: 80 }}
-      animate={{ width: 280 }}
-      transition={{ duration: 0.3, ease: 'easeInOut' }}
-      className="fixed left-0 top-0 h-full bg-white border-r border-neutral-200 z-30 shadow-soft"
+    <Box
+      sx={{
+        width: '100%',
+        height: '100%',
+        backgroundColor: 'background.paper',
+        borderRight: 1,
+        borderColor: 'divider',
+        display: 'flex',
+        flexDirection: 'column',
+      }}
     >
-      <div className="p-6">
-        <div className="flex items-center space-x-3">
-          <div className="w-12 h-12 bg-primary-500 rounded-xl flex items-center justify-center">
-            <Shield className="w-6 h-6 text-white" />
-          </div>
-          <div>
-            <h1 className="text-lg font-bold text-neutral-900">Supply Chain</h1>
-            <p className="text-sm text-neutral-500">Monitor</p>
-          </div>
-        </div>
+      {/* Header */}
+      <Box sx={{ p: 3, borderBottom: 1, borderColor: 'divider' }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+          <Box
+            sx={{
+              width: 48,
+              height: 48,
+              backgroundColor: 'primary.main',
+              borderRadius: 2,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              mr: 2,
+            }}
+          >
+            <SecurityIcon sx={{ color: 'white', fontSize: 24 }} />
+          </Box>
+          <Box>
+            <Typography variant="h6" fontWeight="bold" color="text.primary">
+              Supply Chain
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              Monitor
+            </Typography>
+          </Box>
+        </Box>
         
-        <div className="mt-6 flex items-center space-x-2 text-sm">
-          <div className="w-3 h-3 bg-success-500 rounded-full animate-pulse-slow"></div>
-          <span className="text-neutral-600">Live</span>
-          <span className="text-neutral-400">•</span>
-          <span className="text-neutral-500">Real-time data</span>
-        </div>
-      </div>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+          <Box
+            sx={{
+              width: 8,
+              height: 8,
+              backgroundColor: 'success.main',
+              borderRadius: '50%',
+              animation: 'pulse 2s infinite',
+            }}
+          />
+          <Typography variant="body2" color="text.secondary">
+            Live • Real-time data
+          </Typography>
+        </Box>
+      </Box>
 
-      <nav className="mt-8 px-4">
-        <div className="space-y-1">
+      {/* Main Navigation */}
+      <Box sx={{ flex: 1, overflow: 'auto' }}>
+        <List sx={{ px: 2, py: 1 }}>
           {navigationItems.map((item) => (
-            <button
-              key={item.name}
-              className={clsx(
-                'flex items-center space-x-3 px-3 py-3 rounded-lg transition-all duration-200 w-full text-left',
-                'hover:bg-neutral-100 group relative',
-                item.active
-                  ? 'bg-primary-50 text-primary-700 border-r-2 border-primary-500'
-                  : 'text-neutral-600 hover:text-neutral-900'
-              )}
-            >
-              <item.icon className="w-5 h-5 flex-shrink-0" />
-              <div className="flex-1">
-                <div className="flex items-center justify-between">
-                  <span className="font-medium">{item.name}</span>
-                  {item.name === 'Alerts' && criticalAlertsCount > 0 && (
-                    <span className="w-6 h-6 bg-error-500 text-white text-xs rounded-full flex items-center justify-center">
-                      {criticalAlertsCount}
-                    </span>
-                  )}
-                </div>
-                <p className="text-xs text-neutral-500 mt-0.5">{item.description}</p>
-              </div>
-            </button>
-          ))}
-        </div>
-
-        <div className="mt-8 pt-6 border-t border-neutral-200">
-          <div className="space-y-1">
-            {secondaryItems.map((item) => (
-              <button
-                key={item.name}
-                className={clsx(
-                  'flex items-center space-x-3 px-3 py-2 rounded-lg transition-all duration-200 w-full text-left',
-                  'hover:bg-neutral-100 group',
-                  'text-neutral-600 hover:text-neutral-900'
-                )}
+            <ListItem key={item.name} disablePadding sx={{ mb: 0.5 }}>
+              <ListItemButton
+                sx={{
+                  borderRadius: 2,
+                  py: 1.5,
+                  backgroundColor: item.active ? 'primary.50' : 'transparent',
+                  color: item.active ? 'primary.main' : 'text.primary',
+                  '&:hover': {
+                    backgroundColor: item.active ? 'primary.100' : 'action.hover',
+                  },
+                  borderRight: item.active ? 3 : 0,
+                  borderColor: 'primary.main',
+                }}
               >
-                <item.icon className="w-4 h-4 flex-shrink-0" />
-                <div className="flex-1">
-                  <span className="text-sm font-medium">{item.name}</span>
-                  <p className="text-xs text-neutral-500 mt-0.5">{item.description}</p>
-                </div>
-              </button>
-            ))}
-          </div>
-        </div>
-      </nav>
-    </motion.div>
+                <ListItemIcon
+                  sx={{
+                    color: item.active ? 'primary.main' : 'text.secondary',
+                    minWidth: 40,
+                  }}
+                >
+                  {item.name === 'Alerts' && criticalAlertsCount > 0 ? (
+                    <Badge badgeContent={criticalAlertsCount} color="error">
+                      <item.icon />
+                    </Badge>
+                  ) : (
+                    <item.icon />
+                  )}
+                </ListItemIcon>
+                <ListItemText
+                  primary={
+                    <Typography variant="body2" fontWeight={item.active ? 600 : 400}>
+                      {item.name}
+                    </Typography>
+                  }
+                  secondary={
+                    <Typography variant="caption" color="text.secondary">
+                      {item.description}
+                    </Typography>
+                  }
+                />
+              </ListItemButton>
+            </ListItem>
+          ))}
+        </List>
+
+        <Divider sx={{ mx: 2, my: 2 }} />
+
+        {/* Secondary Navigation */}
+        <List sx={{ px: 2 }}>
+          {secondaryItems.map((item) => (
+            <ListItem key={item.name} disablePadding sx={{ mb: 0.5 }}>
+              <ListItemButton
+                sx={{
+                  borderRadius: 2,
+                  py: 1,
+                  '&:hover': {
+                    backgroundColor: 'action.hover',
+                  },
+                }}
+              >
+                <ListItemIcon
+                  sx={{
+                    color: 'text.secondary',
+                    minWidth: 40,
+                  }}
+                >
+                  <item.icon />
+                </ListItemIcon>
+                <ListItemText
+                  primary={
+                    <Typography variant="body2">
+                      {item.name}
+                    </Typography>
+                  }
+                  secondary={
+                    <Typography variant="caption" color="text.secondary">
+                      {item.description}
+                    </Typography>
+                  }
+                />
+              </ListItemButton>
+            </ListItem>
+          ))}
+        </List>
+      </Box>
+
+      {/* Status Footer */}
+      <Box sx={{ p: 2, borderTop: 1, borderColor: 'divider' }}>
+        <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+          <Chip
+            label="System Operational"
+            color="success"
+            size="small"
+            variant="outlined"
+          />
+          <Chip
+            label="95% Uptime"
+            color="primary"
+            size="small"
+            variant="outlined"
+          />
+        </Box>
+      </Box>
+    </Box>
   );
 }

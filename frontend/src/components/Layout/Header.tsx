@@ -1,24 +1,84 @@
 import React, { useState } from 'react';
 import {
+  AppBar,
+  Toolbar,
+  Box,
+  IconButton,
+  InputBase,
+  Badge,
+  Avatar,
+  Typography,
   Menu,
-  Search,
-  Bell,
-  Settings,
-  User,
-  LogOut,
-  Sun,
-  Moon,
-  Maximize,
-  RefreshCw,
-} from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+  MenuItem,
+  Divider,
+  Chip,
+  Paper,
+  List,
+  ListItem,
+  ListItemText,
+  ListItemIcon,
+  Popover,
+} from '@mui/material';
+import {
+  Search as SearchIcon,
+  Notifications as NotificationsIcon,
+  AccountCircle as AccountIcon,
+  Refresh as RefreshIcon,
+  LightMode as LightModeIcon,
+  DarkMode as DarkModeIcon,
+  Settings as SettingsIcon,
+  Logout as LogoutIcon,
+  Fullscreen as FullscreenIcon,
+} from '@mui/icons-material';
+import { alpha, styled } from '@mui/material/styles';
 import { useAppContext } from '../../contexts/AppContext';
 import { format } from 'date-fns';
 
+const Search = styled('div')(({ theme }) => ({
+  position: 'relative',
+  borderRadius: theme.shape.borderRadius,
+  backgroundColor: alpha(theme.palette.common.white, 0.15),
+  '&:hover': {
+    backgroundColor: alpha(theme.palette.common.white, 0.25),
+  },
+  marginLeft: 0,
+  width: '100%',
+  [theme.breakpoints.up('sm')]: {
+    marginLeft: theme.spacing(1),
+    width: 'auto',
+  },
+}));
+
+const SearchIconWrapper = styled('div')(({ theme }) => ({
+  padding: theme.spacing(0, 2),
+  height: '100%',
+  position: 'absolute',
+  pointerEvents: 'none',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+}));
+
+const StyledInputBase = styled(InputBase)(({ theme }) => ({
+  color: 'inherit',
+  width: '100%',
+  '& .MuiInputBase-input': {
+    padding: theme.spacing(1, 1, 1, 0),
+    paddingLeft: `calc(1em + ${theme.spacing(4)})`,
+    transition: theme.transitions.create('width'),
+    [theme.breakpoints.up('sm')]: {
+      width: '20ch',
+      '&:focus': {
+        width: '30ch',
+      },
+    },
+  },
+}));
+
 export default function Header() {
   const { state, dispatch } = useAppContext();
-  const [showUserMenu, setShowUserMenu] = useState(false);
-  const [showNotifications, setShowNotifications] = useState(false);
+  const [userMenuAnchor, setUserMenuAnchor] = useState<null | HTMLElement>(null);
+  const [notificationsAnchor, setNotificationsAnchor] = useState<null | HTMLElement>(null);
   const [currentTime, setCurrentTime] = useState(new Date());
 
   // Update time every second
@@ -32,175 +92,243 @@ export default function Header() {
   ).length;
 
   const refreshData = () => {
-    // Trigger data refresh
     dispatch({ type: 'SET_LOADING', payload: true });
     setTimeout(() => {
       dispatch({ type: 'SET_LOADING', payload: false });
     }, 1000);
   };
 
+  const handleUserMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
+    setUserMenuAnchor(event.currentTarget);
+  };
+
+  const handleUserMenuClose = () => {
+    setUserMenuAnchor(null);
+  };
+
+  const handleNotificationsOpen = (event: React.MouseEvent<HTMLElement>) => {
+    setNotificationsAnchor(event.currentTarget);
+  };
+
+  const handleNotificationsClose = () => {
+    setNotificationsAnchor(null);
+  };
+
   return (
-    <header className="fixed top-0 right-0 left-0 lg:left-80 bg-white border-b border-neutral-200 z-20 shadow-soft">
-      <div className="flex items-center justify-between px-6 py-4">
-        <div className="flex items-center space-x-4">
-          <button
-            onClick={() => dispatch({ type: 'TOGGLE_SIDEBAR' })}
-            className="p-2 hover:bg-neutral-100 rounded-lg transition-colors lg:hidden"
-          >
-            <Menu className="w-5 h-5" />
-          </button>
+    <AppBar
+      position="fixed"
+      sx={{
+        backgroundColor: 'background.paper',
+        color: 'text.primary',
+        boxShadow: 1,
+        borderBottom: 1,
+        borderColor: 'divider',
+      }}
+    >
+      <Toolbar sx={{ justifyContent: 'space-between' }}>
+        {/* Left side - Search */}
+        <Box sx={{ display: 'flex', alignItems: 'center', flex: 1 }}>
+          <Search>
+            <SearchIconWrapper>
+              <SearchIcon />
+            </SearchIconWrapper>
+            <StyledInputBase
+              placeholder="Search alerts, locations, or routes..."
+              inputProps={{ 'aria-label': 'search' }}
+            />
+          </Search>
+        </Box>
 
-          <div className="hidden lg:flex items-center space-x-4">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-neutral-400" />
-              <input
-                type="text"
-                placeholder="Search alerts, locations, or routes..."
-                className="pl-10 pr-4 py-2 w-80 border border-neutral-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-              />
-            </div>
-          </div>
-        </div>
+        {/* Center - Time and Status */}
+        <Box sx={{ display: { xs: 'none', md: 'flex' }, alignItems: 'center', gap: 2 }}>
+          <Typography variant="body2" color="text.secondary">
+            {format(currentTime, 'EEEE, MMMM d')}
+          </Typography>
+          <Typography variant="body2" fontFamily="monospace" color="text.primary">
+            {format(currentTime, 'HH:mm:ss')}
+          </Typography>
+          <Chip label="UTC" size="small" color="success" variant="outlined" />
+        </Box>
 
-        <div className="flex items-center space-x-4">
-          <div className="hidden md:flex items-center space-x-4 text-sm text-neutral-600">
-            <span>{format(currentTime, 'EEEE, MMMM d')}</span>
-            <span className="font-mono">{format(currentTime, 'HH:mm:ss')}</span>
-            <span className="text-xs px-2 py-1 bg-success-100 text-success-700 rounded-full">UTC</span>
-          </div>
-
-          <button
+        {/* Right side - Actions */}
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+          {/* Refresh Button */}
+          <IconButton
             onClick={refreshData}
             disabled={state.isLoading}
-            className="p-2 hover:bg-neutral-100 rounded-lg transition-colors disabled:opacity-50"
+            color="inherit"
+            sx={{
+              '& svg': {
+                animation: state.isLoading ? 'spin 1s linear infinite' : 'none',
+              },
+            }}
           >
-            <RefreshCw className={`w-4 h-4 ${state.isLoading ? 'animate-spin' : ''}`} />
-          </button>
+            <RefreshIcon />
+          </IconButton>
 
-          <button
+          {/* Theme Toggle */}
+          <IconButton
             onClick={() => dispatch({ type: 'TOGGLE_THEME' })}
-            className="p-2 hover:bg-neutral-100 rounded-lg transition-colors"
+            color="inherit"
           >
-            {state.theme === 'light' ? (
-              <Moon className="w-4 h-4" />
+            {state.theme === 'light' ? <DarkModeIcon /> : <LightModeIcon />}
+          </IconButton>
+
+          {/* Notifications */}
+          <IconButton
+            onClick={handleNotificationsOpen}
+            color="inherit"
+          >
+            <Badge badgeContent={unreadNotifications} color="error">
+              <NotificationsIcon />
+            </Badge>
+          </IconButton>
+
+          {/* User Menu */}
+          <IconButton
+            onClick={handleUserMenuOpen}
+            color="inherit"
+            sx={{ ml: 1 }}
+          >
+            {state.user?.avatar ? (
+              <Avatar
+                src={state.user.avatar}
+                alt={state.user.name}
+                sx={{ width: 32, height: 32 }}
+              />
             ) : (
-              <Sun className="w-4 h-4" />
+              <Avatar sx={{ width: 32, height: 32, bgcolor: 'primary.main' }}>
+                <AccountIcon />
+              </Avatar>
             )}
-          </button>
+          </IconButton>
 
-          <div className="relative">
-            <button
-              onClick={() => setShowNotifications(!showNotifications)}
-              className="relative p-2 hover:bg-neutral-100 rounded-lg transition-colors"
+          {/* User name (hidden on mobile) */}
+          <Box sx={{ display: { xs: 'none', md: 'block' }, ml: 1 }}>
+            <Typography variant="body2" fontWeight="medium">
+              {state.user?.name || 'Alex Chen'}
+            </Typography>
+            <Typography variant="caption" color="text.secondary">
+              {state.user?.role || 'Supply Chain Manager'}
+            </Typography>
+          </Box>
+        </Box>
+      </Toolbar>
+
+      {/* Notifications Popover */}
+      <Popover
+        open={Boolean(notificationsAnchor)}
+        anchorEl={notificationsAnchor}
+        onClose={handleNotificationsClose}
+        anchorOrigin={{
+          vertical: 'bottom',
+          horizontal: 'right',
+        }}
+        transformOrigin={{
+          vertical: 'top',
+          horizontal: 'right',
+        }}
+      >
+        <Paper sx={{ width: 320, maxHeight: 400 }}>
+          <Box sx={{ p: 2, borderBottom: 1, borderColor: 'divider' }}>
+            <Typography variant="h6">Notifications</Typography>
+            <Typography variant="body2" color="text.secondary">
+              {unreadNotifications} unread
+            </Typography>
+          </Box>
+          <List sx={{ maxHeight: 300, overflow: 'auto' }}>
+            {state.alerts
+              .filter(alert => !alert.acknowledged && alert.severity === 'critical')
+              .slice(0, 5)
+              .map(alert => (
+                <ListItem key={alert.id} divider>
+                  <ListItemIcon>
+                    <Box
+                      sx={{
+                        width: 8,
+                        height: 8,
+                        borderRadius: '50%',
+                        bgcolor: 'error.main',
+                      }}
+                    />
+                  </ListItemIcon>
+                  <ListItemText
+                    primary={alert.title}
+                    secondary={
+                      <Box>
+                        <Typography variant="caption" display="block">
+                          {alert.location}
+                        </Typography>
+                        <Typography variant="caption" color="text.disabled">
+                          {format(alert.createdAt, 'HH:mm')}
+                        </Typography>
+                      </Box>
+                    }
+                  />
+                </ListItem>
+              ))}
+          </List>
+          <Box sx={{ p: 2, borderTop: 1, borderColor: 'divider' }}>
+            <Typography
+              variant="body2"
+              color="primary"
+              sx={{ cursor: 'pointer', '&:hover': { textDecoration: 'underline' } }}
             >
-              <Bell className="w-4 h-4" />
-              {unreadNotifications > 0 && (
-                <span className="absolute -top-1 -right-1 w-5 h-5 bg-error-500 text-white text-xs rounded-full flex items-center justify-center">
-                  {unreadNotifications}
-                </span>
-              )}
-            </button>
+              View all notifications
+            </Typography>
+          </Box>
+        </Paper>
+      </Popover>
 
-            <AnimatePresence>
-              {showNotifications && (
-                <motion.div
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: 10 }}
-                  className="absolute right-0 mt-2 w-80 bg-white rounded-lg shadow-strong border border-neutral-200 z-50"
-                >
-                  <div className="p-4 border-b border-neutral-200">
-                    <h3 className="font-semibold text-neutral-900">Notifications</h3>
-                    <p className="text-sm text-neutral-500">{unreadNotifications} unread</p>
-                  </div>
-                  <div className="max-h-96 overflow-y-auto">
-                    {state.alerts
-                      .filter(alert => !alert.acknowledged && alert.severity === 'critical')
-                      .slice(0, 5)
-                      .map(alert => (
-                        <div key={alert.id} className="p-4 border-b border-neutral-100 hover:bg-neutral-50">
-                          <div className="flex items-start space-x-3">
-                            <div className="w-2 h-2 bg-error-500 rounded-full mt-2 flex-shrink-0"></div>
-                            <div className="flex-1">
-                              <p className="text-sm font-medium text-neutral-900">{alert.title}</p>
-                              <p className="text-xs text-neutral-500 mt-1">{alert.location}</p>
-                              <p className="text-xs text-neutral-400 mt-1">
-                                {format(alert.createdAt, 'HH:mm')}
-                              </p>
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                  </div>
-                  <div className="p-4 border-t border-neutral-200">
-                    <button className="text-sm text-primary-600 hover:text-primary-700 font-medium">
-                      View all notifications
-                    </button>
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
-
-          <div className="relative">
-            <button
-              onClick={() => setShowUserMenu(!showUserMenu)}
-              className="flex items-center space-x-2 p-2 hover:bg-neutral-100 rounded-lg transition-colors"
-            >
-              {state.user?.avatar ? (
-                <img
-                  src={state.user.avatar}
-                  alt={state.user.name}
-                  className="w-8 h-8 rounded-full object-cover"
-                />
-              ) : (
-                <div className="w-8 h-8 bg-primary-500 rounded-full flex items-center justify-center">
-                  <User className="w-4 h-4 text-white" />
-                </div>
-              )}
-              <div className="hidden md:block text-left">
-                <p className="text-sm font-medium text-neutral-900">{state.user?.name}</p>
-                <p className="text-xs text-neutral-500">{state.user?.role}</p>
-              </div>
-            </button>
-
-            <AnimatePresence>
-              {showUserMenu && (
-                <motion.div
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: 10 }}
-                  className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-strong border border-neutral-200 z-50"
-                >
-                  <div className="p-4 border-b border-neutral-200">
-                    <p className="font-medium text-neutral-900">{state.user?.name}</p>
-                    <p className="text-sm text-neutral-500">{state.user?.email}</p>
-                  </div>
-                  <div className="py-2">
-                    <button className="flex items-center space-x-2 w-full px-4 py-2 text-sm hover:bg-neutral-100 transition-colors">
-                      <User className="w-4 h-4" />
-                      <span>Profile</span>
-                    </button>
-                    <button className="flex items-center space-x-2 w-full px-4 py-2 text-sm hover:bg-neutral-100 transition-colors">
-                      <Settings className="w-4 h-4" />
-                      <span>Settings</span>
-                    </button>
-                    <button className="flex items-center space-x-2 w-full px-4 py-2 text-sm hover:bg-neutral-100 transition-colors">
-                      <Maximize className="w-4 h-4" />
-                      <span>Full Screen</span>
-                    </button>
-                    <hr className="my-2" />
-                    <button className="flex items-center space-x-2 w-full px-4 py-2 text-sm text-error-600 hover:bg-error-50 transition-colors">
-                      <LogOut className="w-4 h-4" />
-                      <span>Sign Out</span>
-                    </button>
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
-        </div>
-      </div>
-    </header>
+      {/* User Menu */}
+      <Menu
+        anchorEl={userMenuAnchor}
+        open={Boolean(userMenuAnchor)}
+        onClose={handleUserMenuClose}
+        anchorOrigin={{
+          vertical: 'bottom',
+          horizontal: 'right',
+        }}
+        transformOrigin={{
+          vertical: 'top',
+          horizontal: 'right',
+        }}
+      >
+        <Box sx={{ p: 2, minWidth: 200 }}>
+          <Typography variant="subtitle2" fontWeight="bold">
+            {state.user?.name || 'Alex Chen'}
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
+            {state.user?.email || 'alex.chen@company.com'}
+          </Typography>
+        </Box>
+        <Divider />
+        <MenuItem onClick={handleUserMenuClose}>
+          <ListItemIcon>
+            <AccountIcon fontSize="small" />
+          </ListItemIcon>
+          Profile
+        </MenuItem>
+        <MenuItem onClick={handleUserMenuClose}>
+          <ListItemIcon>
+            <SettingsIcon fontSize="small" />
+          </ListItemIcon>
+          Settings
+        </MenuItem>
+        <MenuItem onClick={handleUserMenuClose}>
+          <ListItemIcon>
+            <FullscreenIcon fontSize="small" />
+          </ListItemIcon>
+          Full Screen
+        </MenuItem>
+        <Divider />
+        <MenuItem onClick={handleUserMenuClose} sx={{ color: 'error.main' }}>
+          <ListItemIcon>
+            <LogoutIcon fontSize="small" sx={{ color: 'error.main' }} />
+          </ListItemIcon>
+          Sign Out
+        </MenuItem>
+      </Menu>
+    </AppBar>
   );
 }
