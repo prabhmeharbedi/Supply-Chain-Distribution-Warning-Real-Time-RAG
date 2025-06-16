@@ -1,140 +1,141 @@
 import React from 'react';
 import { 
-  Grid, 
-  Card, 
-  CardContent, 
-  Typography, 
-  Box,
-  Chip
-} from '@mui/material';
-import {
-  Warning as WarningIcon,
-  Error as ErrorIcon,
-  TrendingUp as TrendingUpIcon,
-  Route as RouteIcon,
-  Speed as SpeedIcon,
-  HealthAndSafety as HealthIcon
-} from '@mui/icons-material';
-import { DashboardStats } from '../../api/client';
+  TrendingUp, 
+  TrendingDown, 
+  Activity, 
+  AlertTriangle, 
+  Shield, 
+  Zap,
+  Clock,
+  Target
+} from 'lucide-react';
 
-interface StatsCardsProps {
-  stats: DashboardStats | null;
+interface StatCardProps {
+  title: string;
+  value: string | number;
+  change?: string;
+  changeType?: 'positive' | 'negative' | 'neutral';
+  icon: React.ReactNode;
+  color: 'blue' | 'red' | 'green' | 'yellow' | 'purple' | 'indigo';
 }
 
-const StatsCards: React.FC<StatsCardsProps> = ({ stats }) => {
-  if (!stats) {
-    return (
-      <Grid container spacing={3}>
-        {[1, 2, 3, 4, 5, 6].map((i) => (
-          <Grid item xs={12} sm={6} md={4} lg={2} key={i}>
-            <Card>
-              <CardContent>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                  <Box sx={{ 
-                    p: 1, 
-                    borderRadius: 1, 
-                    backgroundColor: 'grey.100',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center'
-                  }}>
-                    <SpeedIcon color="disabled" />
-                  </Box>
-                  <Box>
-                    <Typography variant="h6" color="text.secondary">
-                      --
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      Loading...
-                    </Typography>
-                  </Box>
-                </Box>
-              </CardContent>
-            </Card>
-          </Grid>
-        ))}
-      </Grid>
-    );
-  }
+const StatCard: React.FC<StatCardProps> = ({ title, value, change, changeType, icon, color }) => {
+  const colorClasses = {
+    blue: 'bg-primary-100 text-primary-600',
+    red: 'bg-error-100 text-error-600',
+    green: 'bg-success-100 text-success-600',
+    yellow: 'bg-warning-100 text-warning-600',
+    purple: 'bg-purple-100 text-purple-600',
+    indigo: 'bg-indigo-100 text-indigo-600'
+  };
 
-  const cards = [
-    {
-      title: 'Total Alerts (24h)',
-      value: stats.total_alerts_24h,
-      icon: <WarningIcon />,
-      color: 'warning' as const,
-      bgColor: 'warning.light'
-    },
-    {
-      title: 'Critical Alerts',
-      value: stats.critical_alerts_24h,
-      icon: <ErrorIcon />,
-      color: 'error' as const,
-      bgColor: 'error.light'
-    },
-    {
-      title: 'Active Disruptions',
-      value: stats.active_disruptions,
-      icon: <TrendingUpIcon />,
-      color: 'info' as const,
-      bgColor: 'info.light'
-    },
-    {
-      title: 'Affected Routes',
-      value: stats.affected_routes?.length || 0,
-      icon: <RouteIcon />,
-      color: 'secondary' as const,
-      bgColor: 'secondary.light'
-    },
-    {
-      title: 'Avg Confidence',
-      value: `${Math.round((stats.average_confidence || 0) * 100)}%`,
-      icon: <SpeedIcon />,
-      color: 'success' as const,
-      bgColor: 'success.light'
-    },
-    {
-      title: 'System Health',
-      value: stats.system_health,
-      icon: <HealthIcon />,
-      color: stats.system_health === 'healthy' ? 'success' as const : 'warning' as const,
-      bgColor: stats.system_health === 'healthy' ? 'success.light' : 'warning.light'
-    }
-  ];
+  const valueColorClasses = {
+    blue: 'text-primary-600',
+    red: 'text-error-600',
+    green: 'text-success-600',
+    yellow: 'text-warning-600',
+    purple: 'text-purple-600',
+    indigo: 'text-indigo-600'
+  };
 
   return (
-    <Grid container spacing={3}>
-      {cards.map((card, index) => (
-        <Grid item xs={12} sm={6} md={4} lg={2} key={index}>
-          <Card sx={{ height: '100%' }}>
-            <CardContent>
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                <Box sx={{ 
-                  p: 1, 
-                  borderRadius: 1, 
-                  backgroundColor: card.bgColor,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  color: 'white'
-                }}>
-                  {card.icon}
-                </Box>
-                <Box sx={{ flex: 1 }}>
-                  <Typography variant="h5" component="div" fontWeight="bold">
-                    {card.value}
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    {card.title}
-                  </Typography>
-                </Box>
-              </Box>
-            </CardContent>
-          </Card>
-        </Grid>
-      ))}
-    </Grid>
+    <div className="bg-white rounded-xl shadow-soft border border-neutral-200 p-6 hover:shadow-medium transition-all duration-200 hover:translate-y-[-2px]">
+      <div className="flex items-center justify-between">
+        <div className="flex-1">
+          <p className="text-sm font-medium text-neutral-600 mb-1">{title}</p>
+          <p className={`text-3xl font-bold ${valueColorClasses[color]}`}>{value}</p>
+          {change && (
+            <div className="mt-3 flex items-center text-sm">
+              {changeType === 'positive' && <TrendingUp className="h-4 w-4 text-success-500 mr-1" />}
+              {changeType === 'negative' && <TrendingDown className="h-4 w-4 text-error-500 mr-1" />}
+              <span className={`font-medium ${
+                changeType === 'positive' ? 'text-success-600' : 
+                changeType === 'negative' ? 'text-error-600' : 
+                'text-neutral-600'
+              }`}>
+                {change}
+              </span>
+              <span className="text-neutral-500 ml-1">vs last period</span>
+            </div>
+          )}
+        </div>
+        <div className={`h-14 w-14 rounded-xl flex items-center justify-center ${colorClasses[color]}`}>
+          {icon}
+        </div>
+      </div>
+    </div>
   );
 };
 
-export default StatsCards; 
+interface StatsCardsProps {
+  stats: {
+    totalAlerts24h: number;
+    criticalAlerts: number;
+    systemHealth: string;
+    averageConfidence: number;
+    activeDisruptions: number;
+    resolvedToday: number;
+  };
+}
+
+const StatsCards: React.FC<StatsCardsProps> = ({ stats }) => {
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+      <StatCard
+        title="Total Alerts (24h)"
+        value={stats.totalAlerts24h}
+        change="+12%"
+        changeType="positive"
+        icon={<Activity className="h-7 w-7" />}
+        color="blue"
+      />
+      
+      <StatCard
+        title="Critical Alerts"
+        value={stats.criticalAlerts}
+        change="Requires attention"
+        changeType="negative"
+        icon={<AlertTriangle className="h-7 w-7" />}
+        color="red"
+      />
+      
+      <StatCard
+        title="System Health"
+        value={stats.systemHealth}
+        change="+2%"
+        changeType="positive"
+        icon={<Shield className="h-7 w-7" />}
+        color="green"
+      />
+      
+      <StatCard
+        title="ML Confidence"
+        value={`${Math.round(stats.averageConfidence)}%`}
+        change="+5%"
+        changeType="positive"
+        icon={<Zap className="h-7 w-7" />}
+        color="purple"
+      />
+      
+      <StatCard
+        title="Active Disruptions"
+        value={stats.activeDisruptions}
+        change="-3"
+        changeType="positive"
+        icon={<Target className="h-7 w-7" />}
+        color="yellow"
+      />
+      
+      <StatCard
+        title="Resolved Today"
+        value={stats.resolvedToday}
+        change="+8"
+        changeType="positive"
+        icon={<Clock className="h-7 w-7" />}
+        color="indigo"
+      />
+    </div>
+  );
+};
+
+export default StatsCards;
